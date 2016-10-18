@@ -1,29 +1,28 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func main() {
-    f()
-    fmt.Println("Returned normally from f.")
-}
 
-func f() {
-    defer func() {
-        if r := recover(); r != nil {
-            fmt.Println("Recovered in f", r)
-        }
-    }()
-    fmt.Println("Calling g.")
-    g(0)
-    fmt.Println("Returned normally from g.")
-}
+	// Fungsi berikut untuk melakukan recover supaya
+	// program berakhir dengan baik, tidak menampilkan
+	// run time error seperti di panic.go
+	defer func() {
+		if e := recover(); e != nil {
+			fmt.Println("Masalah:", e)
+		}
+	}()
 
-func g(i int) {
-    if i > 3 {
-        fmt.Println("Panicking!")
-        panic(fmt.Sprintf("%v", i))
-    }
-    defer fmt.Println("Defer in g", i)
-    fmt.Println("Printing in g", i)
-    g(i + 1)
+	if _, err := os.Stat("not-exist.txt"); err != nil {
+		panic("File yang diperlukan tidak ada!")
+	}
+
+	// Jika file not-exist.txt tidak ada di current dir
+	// maka kode di bawah ini tidak akan pernah di eksekusi
+
+	fmt.Println("Setelah memeriksa file ... melanjutkan")
+
 }
